@@ -1,0 +1,40 @@
+version: '3.10'
+services:
+  backend:
+    build:
+      context: .
+    container_name: chatform
+    ports:
+      - "8000:8000"
+      - "12345:12345"  
+    env_file:
+      - .env
+    depends_on:
+      - postgres-db
+    command: /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+    networks:
+      - dockernet
+
+  version: '3'
+
+  services:
+  sqlite-db:
+    image: 'python:3.11.6' 
+    command: tail -f /dev/null  
+    environment:
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_USER_PASSWORD: ${DB_USER_PASSWORD}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+    volumes:
+      - sqlite-data:/app/data  
+    networks:
+      - dockernet
+
+networks:
+  dockernet:
+    driver: bridge
+
+volumes:
+  sqlite-data: 
